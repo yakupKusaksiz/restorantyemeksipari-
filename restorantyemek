@@ -1,0 +1,158 @@
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+struct Yemek {
+    string isim;
+    float fiyat;
+};
+
+const int MAX_YEMEK_SAYISI = 4;
+Yemek menu[MAX_YEMEK_SAYISI];
+Yemek siparis[MAX_YEMEK_SAYISI];
+int menuSayisi = 0;
+int siparisSayisi = 0;
+
+void menuEkle(const string& isim, float fiyat) {
+    if (menuSayisi < MAX_YEMEK_SAYISI) {
+        menu[menuSayisi].isim = isim;
+        menu[menuSayisi].fiyat = fiyat;
+        ++menuSayisi;
+    } else {
+        cout << "Menu dolu, yeni yemek eklenemiyor." << endl;
+    }
+}
+
+void yemekListele() {
+    cout << "Hazir Yemekler:" << endl;
+    for (int i = 0; i < menuSayisi; ++i) {
+        cout << i + 1 << ". " << menu[i].isim << " - " << fixed << setprecision(2) << menu[i].fiyat << " TL" << endl;
+    }
+}
+
+void yemekAra(const string& isim) {
+    bool bulundu = false;
+    for (int i = 0; i < menuSayisi; ++i) {
+        if (menu[i].isim == isim) {
+            cout << "Yemek bulundu: " << menu[i].isim << " - " << fixed << setprecision(2) << menu[i].fiyat << " TL" << endl;
+            bulundu = true;
+            break;
+        }
+    }
+    if (!bulundu) {
+        cout << "Yemek bulunamadi." << endl;
+    }
+}
+
+void siparisAl() {
+    int secim;
+    cout << "Lutfen bir yemek seciniz (1-" << menuSayisi << "): ";
+    cin >> secim;
+
+    if (secim >= 1 && secim <= menuSayisi) {
+        if (siparisSayisi < MAX_YEMEK_SAYISI) {
+            siparis[siparisSayisi].isim = menu[secim - 1].isim;
+            siparis[siparisSayisi].fiyat = menu[secim - 1].fiyat;
+            ++siparisSayisi;
+        } else {
+            cout << "Siparis limitine ulasildi, yeni siparis alinmiyor." << endl;
+        }
+    } else {
+        cout << "Gecersiz secim. Lutfen gecerli bir numara giriniz.\n";
+    }
+}
+
+void siparisToplam() {
+    if (siparisSayisi == 0) {
+        cout << "Siparisiniz bulunmamaktadir." << endl;
+    } else {
+        float toplamFiyat = 0.0;
+        cout << "Siparisiniz:" << endl;
+        for (int i = 0; i < siparisSayisi; ++i) {
+            cout << siparis[i].isim << " - " << fixed << setprecision(2) << siparis[i].fiyat << " TL" << endl;
+            toplamFiyat += siparis[i].fiyat;
+        }
+        cout << "Toplam Fiyat: " << fixed << setprecision(2) << toplamFiyat << " TL" << endl;
+    }
+}
+
+void siparisSil(int siparisNo) {
+    if (siparisNo >= 1 && siparisNo <= siparisSayisi) {
+        for (int i = siparisNo - 1; i < siparisSayisi - 1; ++i) {
+            siparis[i] = siparis[i + 1];
+        }
+        --siparisSayisi;
+        cout << "Siparis silindi." << endl;
+    } else {
+        cout << "Gecersiz siparis numarasi. Lutfen gecerli bir numara giriniz.\n";
+    }
+}
+
+void menuTemizle() {
+    menuSayisi = 0;
+    cout << "Menu temizlendi." << endl;
+}
+
+int main() {
+    int secim;
+
+    // Hazır yemekler ekleniyor
+    menuEkle("Pizza", 200.0);
+    menuEkle("Hamburger", 150.0);
+    menuEkle("Salata", 100.0);
+    menuEkle("Kebap", 400.0);
+
+    do {
+        cout << "\nRestoran Yemek Siparis Sistemi" << endl;
+        cout << "1. Yemek Listele\n";
+        cout << "2. Yemek Ara\n";
+        cout << "3. Siparis Al\n";
+        cout << "4. Siparis Toplamini Goruntule\n";
+        cout << "5. Siparis Sil\n";
+        cout << "6. Menu Temizle\n";
+        cout << "7. Cikis\n";
+
+        cout << "Seciminizi yapiniz: ";
+        cin >> secim;
+
+        switch (secim) {
+            case 1:
+                yemekListele();
+                break;
+            case 2: {
+                string arananYemek;
+                cout << "Aranacak yemek ismini giriniz: ";
+                cin.ignore();  // getline kullanılacağından buffer temizlenir.
+                getline(cin, arananYemek);
+                yemekAra(arananYemek);
+                break;
+            }
+            case 3:
+                siparisAl();
+                break;
+            case 4:
+                siparisToplam();
+                break;
+            case 5: {
+                int silinecekSiparisNo;
+                cout << "Silinecek siparis numarasini giriniz (1-" << siparisSayisi << "): ";
+                cin >> silinecekSiparisNo;
+                siparisSil(silinecekSiparisNo);
+                break;
+            }
+            case 6:
+                menuTemizle();
+                break;
+            case 7:
+                cout << "Cikis yapiliyor..." << endl;
+                break;
+            default:
+                cout << "Gecersiz secim. Lutfen gecerli bir numara giriniz.\n";
+                break;
+        }
+
+    } while (secim != 7);
+
+    return 0;
+}
